@@ -1,18 +1,30 @@
 import React from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { connect, useSelector, useDispatch } from 'react-redux';
 import { deleteMovie } from '../actions/movieActions';
+import { addFavorite } from '../actions/favoritesActions';
 
 const Movie = (props) => {
     const { id } = useParams();
     const { push } = useHistory();
-    const movies = props.movies;
+
+    const movies = useSelector((state) => state.movieReducer.movies)
+    const displayFavorites = useSelector((state) => state.favoritesReducer.displayFavorites)
+    const favorites = useSelector((state) => state.favoritesReducer.favorites)
+    // console.log(movies)
+    const dispatch = useDispatch();
+    // const movies = props.movies;
     const movie = movies.find(movie=>movie.id===Number(id));
-    const deleteMovie = props.deleteMovie
+    // const deleteMovie = props.deleteMovie
 
     const handleClick = () => {
         // console.log(movie.id);
-        deleteMovie(movie.id);
+        dispatch(deleteMovie(movie.id));
+        push('/movies');
+    }
+
+    const handleFav = () => {
+        dispatch(addFavorite(movie));
         push('/movies');
     }
 
@@ -45,7 +57,7 @@ const Movie = (props) => {
                         </section>
                         
                         <section>
-                            <span className="m-2 btn btn-dark">Favorite</span>
+                            {displayFavorites && <span onClick={handleFav} className="m-2 btn btn-dark">Favorite</span>}
                             <span className="delete"><input onClick={handleClick} type="button" className="m-2 btn btn-danger" value="Delete"/></span>
                         </section>
                     </div>
@@ -55,10 +67,11 @@ const Movie = (props) => {
     </div>);
 }
 
-const mapStateToProps = (state) => {
-    return {
-        movies: state.movieReducer.movies
-    }
-}
+// const mapStateToProps = (state) => {
+//     return {
+//         movies: state.movieReducer.movies
+//     }
+// }
 
-export default connect(mapStateToProps, {deleteMovie})(Movie);
+export default Movie
+// export default connect(null, {deleteMovie})(Movie);
